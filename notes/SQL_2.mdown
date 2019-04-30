@@ -1,0 +1,734 @@
+## SQL: Structured Query Language
+
+### I. Lesson 1
+
+**Basic CREATE TABLE statement**.
+
+```sql
+  CREATE TABLE  customer
+  (
+      customerid     NUMBER,
+      firstname      VARCHAR(35),
+      lastname       VARCHAR(55),
+      date_of_birth  DATE,
+      street         VARCHAR(55),
+      city           VARCHAR(50), 
+      state          VARCHAR(2),
+      zipcode        VARCHAR(11),
+      phonenumber    VARCHAR(15)
+  ) ;
+```
+
+We left off some constraints so `DROP TABLE customer`;
+and then `CREATE` the `TABLE` again:
+
+```sql
+  DROP TABLE customer;  
+```
+
+Re-create the customer table:
+
+```sql
+  CREATE TABLE  customer
+  (
+      customerid     NUMBER   NOT NULL,
+      firstname      VARCHAR(35) NOT NULL,
+      lastname       VARCHAR(55) NOT NULL,
+      date_of_birth  DATE,
+      street         VARCHAR(55),
+      city           VARCHAR(50), 
+      state          VARCHAR(2),
+      zipcode        VARCHAR(11),
+      phonenumber    VARCHAR(15),
+          PRIMARY KEY (customerid)
+  ) ;
+```
+
+Try changing the `customerid` data type to `INTEGER`.
+Remember to `DROP TABLE customer` 
+before running this new `CREATE TABLE` statement.
+
+```sql
+  CREATE TABLE  customer
+  (
+      customerid     INTEGER  NOT NULL,
+      firstname      VARCHAR(35) NOT NULL,
+      lastname       VARCHAR(55) NOT NULL,
+      date_of_birth  DATE,
+      street         VARCHAR(55),
+      city           VARCHAR(50), 
+      state          VARCHAR(2),
+      zipcode        VARCHAR(11),
+      phonenumber    VARCHAR(15),
+          PRIMARY KEY (customerid)
+  ) ;
+```
+
+Create an `Orders` table (note the name must be plural "orders"). Make sure to include the `customerid` foreign key.
+
+It is very important that the foreign key have the same name and data type (INTEGER in this example) as the key
+
+in the original or "parent" table (customer table in this example).
+
+```sql
+  CREATE TABLE  orders
+  (
+      orderid          INTEGER  NOT NULL,
+      order_date       DATE NOT NULL,
+      payment_method   VARCHAR(15),
+      customerid       INTEGER NOT NULL,
+          PRIMARY KEY (orderid)
+  ) ;
+```
+
+`ALTER` the `Orders` table to add the foreign key constraint.
+
+```sql
+  ALTER TABLE  orders
+     ADD CONSTRAINT  fk_orders
+       FOREIGN KEY (customerid) 
+          REFERENCES customer (customerid)
+```
+
+Try inserting some data:
+
+```sql
+  INSERT INTO customer 
+    VALUES ( 1, 'Joe', 'Smith', #03/16/1992#, 
+                     '143 E. 23rd. St.' , 'New York', 'NY', '10040', '646-312-1111' )
+
+  INSERT INTO customer (customerid, firstname, lastname, date_of_birth,
+                         street, city, state, zipcode, phonenumber)
+    VALUES ( 1, 'Joe', 'Smith', #03/16/1992#, 
+                     '143 E. 23rd. St.' , 'New York', 'NY', '10010',  '646-312-1111' )
+
+  INSERT INTO customer 
+    VALUES ( 2, 'Mary', 'Green', #01/23/1996#, 
+                     '433 E. 23rd. St.' , 'New York', 'NY', '10040', '646-312-1234' )
+
+  INSERT INTO orders
+    VALUES ( 101,  #03/12/2019#,  'Credit Card', 1 )
+
+  INSERT INTO orders
+    VALUES ( 102,  #03/13/2019#,  'Credit Card', 3 )
+
+```
+
+### II. Lesson 2
+
+```sql
+Question: Show the name of each employee and the
+          name of their department
+
+SELECT     first_name, last_name, department_name
+FROM      employee  
+INNER JOIN department  
+        ON employee.departmentid = department.departmentid  
+```
+
+Question: Show the name of each employee and the
+          name of their department for all departments
+          located in NY
+
+```sql
+SELECT    first_name, last_name, department_name
+FROM      employee  INNER JOIN department  
+              ON employee.departmentid = department.departmentid  
+WHERE   department_location = 'NY'
+```
+
+Question: Show the name of each employee and the
+          name of their department for all departments
+          located in NY or NJ
+
+```
+SELECT     first_name, last_name, department_name
+FROM      employee  INNER JOIN department  
+                  ON employee.departmentid = department.departmentid  
+WHERE   department_location = 'NY'  OR 
+                  department_location = 'NJ'
+```
+
+first_name last_name department_name
+Joe Smith Finance
+Howard Brown Finance
+Mary Green Marketing
+Ed Jones  IT
+Sally Smith IT
+
+Another way:
+
+```sql
+SELECT     first_name, last_name, department_name
+FROM      employee  INNER JOIN department  
+                  ON employee.departmentid = department.departmentid  
+WHERE   department_location IN ( 'NY' ,  'NJ'  )
+```
+
+Question: Show the name of each employee and the 
+          name of their department for all departments
+          located in NY or NJ and the employee makes more 
+          than $40,000.
+
+```sql 
+SELECT    first_name, last_name, department_name
+FROM      employee  
+INNER JOIN department  
+        ON employee.departmentid = department.departmentid  
+WHERE   department_location IN ( 'NY' ,  'NJ'  ) 
+		AND   salary > 40000
+```
+
+first_name last_name department_name
+Joe Smith Finance
+Howard Brown Finance
+Mary Green Marketing
+Sally Smith IT
+
+Question: Show the name of each employee and the 
+          name and id of their department for all departments
+          located in NY or NJ and the employee makes more 
+          than $40,000.
+
+```sql
+SELECT     first_name, last_name, department.departmentid, 
+                department_name
+FROM      employee  INNER JOIN department  
+                  ON employee.departmentid = department.departmentid  
+WHERE   department_location IN ( 'NY' ,  'NJ'  )
+    AND   salary > 40000
+```
+
+first_name last_name departmentid department_name
+Joe Smith 1 Finance
+Howard Brown 1 Finance
+Mary Green 2 Marketing
+Sally Smith 3 IT
+
+```sql
+SELECT     employee.first_name, employee.last_name, 
+           department.departmentid, 
+           department.department_name
+FROM       employee  INNER JOIN department  
+                  ON employee.departmentid = department.departmentid  
+WHERE   department.department_location IN ( 'NY' ,  'NJ'  )
+    AND   employee.salary > 40000
+```
+
+Use Table alias to rename the tables
+
+```sql
+SELECT     morris.first_name, morris.last_name, d.departmentid, 
+           d.department_name
+FROM       employee  morris INNER JOIN department  d
+              ON morris.departmentid = d.departmentid  
+```
+
+Question:  Show the names of each employee and the projects
+           they work on.
+
+```sql
+SELECT     e.first_name, e.last_name, p.project_name
+FROM      ( employee  e INNER JOIN project_assignment pa
+                  ON e.employeeid = pa.employeeid   )
+                INNER JOIN project p
+                   ON pa.project_number = p.project_id
+```
+
+first_name last_name project_name
+Joe Smith Payroll
+Joe Smith Advertising
+Joe Smith Inventory
+Mary Green WebSiteDesign
+Mary Green Advertising
+Ed Jones  RetailPOS
+Ed Jones  WebSiteDesign
+Ed Jones  Inventory
+Sally Smith RetailPOS
+Sally Smith WebSiteDesign
+Howard Brown Payroll
+Howard Brown Advertising
+Howard Brown Newbenefits
+Jane Foster Newbenefits
+
+Question:  How many projects is each employee working on?
+
+```sql
+SELECT     e.first_name, e.last_name, COUNT( p.project_name )
+FROM      ( employee  e INNER JOIN project_assignment pa
+                  ON e.employeeid = pa.employeeid   )
+                INNER JOIN project p
+                   ON pa.project_number = p.project_id
+GROUP BY e.first_name, e.last_name
+```
+
+first_name last_name Expr1002
+Ed Jones  3
+Howard Brown 3
+Jane Foster 1
+Joe Smith 3
+Mary Green 2
+Sally Smith 2
+
+```sql
+SELECT     e.first_name, e.last_name, 
+                 COUNT( p.project_name ) AS Project_Count
+FROM      ( employee  e INNER JOIN project_assignment pa
+                  ON e.employeeid = pa.employeeid   )
+                INNER JOIN project p
+                   ON pa.project_number = p.project_id
+GROUP BY e.first_name, e.last_name
+```
+
+**Question:  How many projects is each employee working on**
+           **that is managed by a department in NY?**
+
+```sql
+SELECT     e.first_name, e.last_name, 
+                 COUNT( p.project_name ) AS Project_Count
+FROM      (  ( employee  e INNER JOIN project_assignment pa
+                       ON e.employeeid = pa.employeeid   )
+                       INNER JOIN project p
+                         ON pa.project_number = p.project_id  )
+                   INNER JOIN  department d
+                          ON d.departmentid = p.departmentid
+WHERE    d.department_location = 'NY'
+GROUP BY e.first_name, e.last_name
+```
+
+first_name last_name Project_Count
+Howard Brown 1
+Joe Smith 1
+
+The result would be different if 
+
+```sql
+  INNER JOIN department d
+   		   ON e.departmentid = p.departmentid
+```
+So be careful!!!
+
+Question: Show the names and salaries of employees sorted 
+by the salary with the largest salary shown first.
+
+```sql
+SELECT  first_name, last_name, salary
+FROM    employee 
+ORDER  BY  salary  DESC;
+```
+
+first_name last_name salary
+Sally Smith 55000
+Howard Brown 45000
+Joe Smith 43000
+Mary Green 41500
+Ed Jones  39500
+Jane Foster 35000
+
+Question: Employees ordered by last name alphabetically
+
+```sql
+SELECT  first_name, last_name, salary
+FROM    employee 
+ORDER  BY  2;
+```
+
+Same as
+
+```sql
+SELECT  first_name, last_name, salary
+FROM    employee 
+ORDER  BY  last_name ASC
+;
+```
+
+Question:  What is the total payroll of all Employees?
+
+```sql
+SELECT  SUM( salary )
+FROM    employee 
+```
+
+Same result just use a column Alias to rename the result
+
+```sql
+SELECT  SUM( salary )  AS Total_Salary
+FROM    employee 
+```
+
+Total_Salary
+259000
+
+Question: Show the total salary (or payroll) of each department
+
+```sql
+SELECT    departmentid, SUM( salary )  AS Total_Salary
+FROM      employee 
+GROUP BY departmentid
+```
+
+departmentid Total_Salary
+1 88000
+2 41500
+3 94500
+4 35000
+
+```sql
+SELECT    departmentid, 
+               SUM( salary )  AS Total_Salary,
+               AVG( salary ) AS Average_Salary,
+               COUNT( employeeid ) AS Employee_Count
+FROM      employee 
+GROUP BY departmentid
+```
+
+departmentid Total_Salary Average_Salary Employee_Count
+1 88000  44000 2
+2 41500  41500 1
+3 94500  47250 2
+4 35000  35000 1
+
+Question: Which departments have average salary more than 42000?
+
+```sql
+SELECT    departmentid, 
+               SUM( salary )  AS Total_Salary,
+               AVG( salary ) AS Average_Salary,
+               COUNT( employeeid ) AS Employee_Count
+FROM      employee 
+GROUP BY departmentid
+HAVING  AVG( salary )  > 42000
+```
+
+departmentid Total_Salary Average_Salary Employee_Count
+1 88000  44000 2
+3 94500  47250 2
+
+Question: Which department has the highest average salary ?
+
+```sql
+SELECT Top 1 departmentid, AVG(Salary) AS Avg_pay
+FROM employee
+GROUP BY departmentid
+ORDER BY AVG(Salary) DESC;
+```
+
+departmentid	Avg_pay
+3	47250
+
+Note: Access SQL does not support LIMIT function, so we use top as an alternative here.
+
+### III. Lesson 3
+
+Question: Show the name of each student and the name
+    of their tutor.   
+    This is an example of a "recursive query".
+
+```sql
+SELECT   s.name AS Student_Name,  t.Name AS Tutor_Name
+FROM    students s 
+INNER JOIN students t
+        ON  t.studentid =  s.student_tutorid
+```
+
+Student_Name Tutor_Name
+Alex Bill
+Mary Bill
+Liz Mary
+Ed Mary
+Sue Bill
+Petra Sue
+
+Question:  For each tutor, how many students do they help?
+
+```sql
+SELECT   t.name, COUNT( s.studentid ) AS Student_Count
+FROM     students s 
+INNER JOIN students t
+        ON  t.studentid =  s.student_tutorid
+GROUP BY t.name;
+```
+
+name Student_Count
+Bill 3
+Mary 2
+Sue 1
+
+Question:  For each tutor, how many students do they help
+            and what is their average grade.
+
+```sql
+SELECT  t.name, 
+		COUNT( s.studentid ) AS Student_Count,
+        AVG( s.grade )   AS Average_Grade
+FROM    students s 
+INNER JOIN students t
+        ON  t.studentid =  s.student_tutorid
+GROUP BY t.name
+
+name Student_Count Average_Grade
+Bill 3  92.3333333333333
+Mary 2  84.5
+Sue 1  86
+```
+
+**Remember**:
+
+If you SELECT a, b, SUM(c), you MUST use __GROUP BY__  a, b 
+
+Question:  How old are each of the employees?
+
+```sql
+SELECT  date_of_birth, Now()
+FROM    employee
+
+SELECT  date_of_birth,   Now(),  ( Now() - date_of_birth ) / 365,
+            FORMAT(   ( Now() - date_of_birth ) / 365,   "00" )
+FROM    employee
+```
+
+Question:  How much does each employee make, and how much
+           will they make after CUNY gives them a whopping 
+           2% raise?
+
+```sql
+SELECT     first_name, last_name, salary
+FROM       employee
+
+SELECT     first_name, last_name, salary,
+                 salary * 1.02
+FROM       employee
+```
+
+**Write each employee a letter**:
+
+```sql
+SELECT     "Dear " &  first_name & ": Your salary is " & salary &
+                 " and your new salary will be: " & salary * 1.02
+FROM       employee
+```
+
+Expr1000
+Dear Joe: Your salary is 43000 and your new salary will be: 43860
+Dear Mary: Your salary is 41500 and your new salary will be: 42330
+Dear Ed: Your salary is 39500 and your new salary will be: 40290
+Dear Sally: Your salary is 55000 and your new salary will be: 56100
+Dear Howard: Your salary is 45000 and your new salary will be: 45900
+Dear Jane: Your salary is 35000 and your new salary will be: 35700
+
+Question: Which employees have "a" in their first name?
+
+```sql
+SELECT     first_name, last_name
+FROM       employee
+WHERE     first_name  LIKE "*a*"
+```
+
+Question: Which employees have a last name starting with "S"
+
+```sql
+SELECT     first_name, last_name
+FROM       employee
+WHERE     last_name  LIKE "S*"
+```
+
+### IV. Lesson 4
+
+Question: What is the largest salary paid?
+
+```sql
+SELECT  MAX( salary )  AS  Largest_Salary
+FROM    employee
+```
+
+Largest_Salary
+55000
+
+Question: Which employees make more than the average?
+
+```sql
+   SELECT  first_name, last_name
+   FROM    employee
+   WHERE   salary > ( SELECT  AVG( salary ) FROM employee )
+```
+
+Question:  Who has the largest salary?
+
+Method A:  Which employee has the salary 55000 ?
+           Use a nested query (subquery)
+
+```sql
+SELECT  first_name, last_name
+FROM    employee
+WHERE   salary = 55000
+```
+
+```sql
+SELECT  first_name, last_name
+FROM    employee
+WHERE   salary = ( SELECT  MAX( salary ) FROM employee )
+```
+
+first_name last_name
+Sally Smith
+
+Method B: Use a correlated subquery. Show the employee where there does not exist another employee who makes more.
+
+```sql
+  SELECT  e1.first_name, e1.last_name
+  FROM    employee e1
+  WHERE   NOT EXISTS
+          (SELECT e2.first_name, e2.last_name
+           FROM   employee e2
+           WHERE  e2.salary > e1.salary )
+```
+
+Method C:   Sort and take the Top 1
+
+```sql
+  SELECT    first_name, last_name
+  FROM      employee
+  ORDER BY  salary DESC
+
+  SELECT   TOP 1 first_name, last_name
+  FROM      employee
+  ORDER BY  salary DESC
+```
+
+**Question: Show the employees who work in a department that is responsible for a project located in New York**
+
+```sql
+  SELECT    e.first_name, e.last_name
+  FROM      employee e
+  WHERE     e.departmentid IN 
+            (  SELECT p.departmentid
+               FROM   project p
+               WHERE  p.project_location = 'NY' )
+```
+
+first_name last_name departmentid
+Joe Smith 1
+Howard Brown 1
+
+**Question:  Show the departmentid and name of every department and the projects they are responsible for. Be sure to include every department.**
+
+```sql
+  SELECT   d.departmentid, d.department_name,
+           p.project_id, p.project_name
+  FROM     department d 
+  INNER JOIN project p
+          ON  d.departmentid = p.departmentid
+```
+
+  But the result is missing Department 2
+
+```sql
+  SELECT   d.departmentid, d.department_name,
+           p.project_id, p.project_name
+  FROM     department d 
+  LEFT OUTER JOIN project p
+               ON  d.departmentid = p.departmentid
+```
+
+departmentid department_name project_id	project_name
+1	Finance	3	Payroll
+2	Marketing		
+3	IT	1	RetailPOS
+3	IT	2	WebSiteDesign
+3	IT	10	Advertising
+4	Accounting	30	Newbenefits
+5	Shipping	20	Inventory
+
+### V. Lesson 5
+
+Q: what is the average salary of in each department?
+
+```sql
+SELECT departmentid, AVG(salary)
+FROM employee
+GROUP BY departmentid;
+```
+
+Q: what is the average salary of in each department after a 6.5% raise?
+
+```sql
+SELECT departmentid, AVG(salary)*1.065
+FROM employee
+GROUP BY departmentid;
+```
+
+Q: For each employee, what 
+avg hrs per week they work on all of their projects?
+
+```sql
+SELECT e.first_name, e.last_name, AVG(pa.hours_per_week) AS average_hours
+FROM employee e 
+INNER JOIN project_assignment pa
+    ON e.employeeid = pa.employeeid
+GROUP BY e.first_name, e.last_name;
+```
+
+If we want to format the avg in the results, then we need to use FORMAT function.
+
+Now use the above as an inline query:
+
+```sql
+SELECT first_name, last_name,
+    FORMAT (average_hours, '0.0')
+FROM (
+  SELECT e.first_name, e.last_name, AVG(pa.hours_per_week) AS average_hours
+  FROM employee e 
+  INNER JOIN project_assignment pa
+      ON e.employeeid = pa.employeeid
+  GROUP BY e.first_name, e.last_name;
+  )
+```
+
+[More about inline query]()
+
+**Your outer query can ONLY select the later part of inline query**
+
+**Indexes**
+
+consists of:
+
+- a set of index entries
+- a key value and a pointer (page_num)
+
+- is organized by key values to speed up the search
+
+Two important ways to use:
+
+1- ensure that key has unique values(no deplicates)
+2- reduce processing time
+
+```sql
+CREATE INDEX idx_deprtamentid
+  ON employee (departmentid);
+```
+
+Q: write a query that can identify these employees working in NY who have HEALTH benefits or no benefits at all.
+
+Ppl have HEALTH benefits AND located in NY:
+
+```sql
+SELECT e.EmployeeID, e.Last_Name, e.First_name
+FROM (employee e
+INNER JOIN benefits b
+    ON e.Soc_Sec = b.SSN)
+    INNER JOIN department d
+      ON d.departmentid = e.departmentid
+WHERE d.department_location = 'NY' AND b.package = 'HEALTH';
+```
+
+Ppl do not have health benefits:
+
+```sql
+SELECT e.EmployeeID, e.Last_Name, e.First_name
+FROM (employee e
+LEFT JOIN benefits b
+    ON e.Soc_Sec = b.SSN)
+    INNER JOIN department d
+      ON d.departmentid = e.departmentid
+WHERE d.department_location = 'NY' AND b.package IS NULL;
+```

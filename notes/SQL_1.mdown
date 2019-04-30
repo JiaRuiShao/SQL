@@ -1,0 +1,76 @@
+## Structured Query Language - DDL (Data Definition Language)
+
+- CREATE, DROP, ALTER for Schemas, Tables, Views and Indexes. 
+
+- What is the purpose of a PRIMARY KEY constraint?
+Indicate which column(s) form the primary key. 
+To make sure every row has their unique id value.
+
+- What is the purpose of a FOREIGN KEY constraint?
+Indicate which column(s) form a foreign key.
+
+- What is the purpose of a NOT NULL constraint?
+Prevent invalid and missing data.
+
+**Creating a Table**:
+
+```sql
+CREATE TABLE Customer
+
+(
+  customerid     INTEGER          NOT NULL,
+  firstname        VARCHAR(35) NOT NULL,
+  lastname         VARCHAR(55) NOT NULL,
+  date_of_birth  DATE,
+  street               VARCHAR(35),
+  city                   VARCHAR(55),
+  state                 VARCHAR(2),
+  zipcode            VARCHAR(11),
+  phonenumber VARCHAR(15),
+  PRIMARY KEY (customerid)
+);
+
+DROP TABLE Customer;
+```
+
+```sql
+CREATE TABLE Orders
+
+(
+  orderid     INTEGER   NOT NULL,
+  order_date  DATE   NOT NULL,
+  payment_method VARCHAR(11),
+  customerid   INTEGER  NOT NULL, 
+  PRIMARY KEY (orderid)
+);
+```
+
+-- must also include foreign key
+
+**Add a fk**:
+
+```sql
+ALTER TABLE Orders
+ADD CONSTRAINT fk_order
+    FOREIGN KEY (customerid) 
+        REFERENCES customer (customerid)
+```
+
+If the info u want to add has the same order with the original table order
+
+```sql
+INSERT INTO customer
+ VALUES (1, 'JOE', 'Smith', #03/16/1992#, '143E. 23rd. St.', 'New York', 'NY', '10040', '646-798-3543')
+
+INSERT INTO Orders
+ VALUES (101, #03/16/1992#, 'Credit Card', 1)
+```
+
+If the info u want to add DO NOT has the same order with the original table order
+
+```sql
+INSERT INTO customer (customerid, firstname, lastname, date_of_birth, street, city, state, zipcode, phonenumber)
+ VALUES (1, 'JOE', 'Smith', #03/16/1992#, '143E. 23rd. St.', 'New York', 'NY', '10040', '646-798-3543')
+```
+
+**Can't use Order! Use Orders as the table name (It's a reserved name!!)**
