@@ -2,7 +2,7 @@
 
 ### Notes
 
-[SQL -- Syntax](https://github.com/JiaRuiShao/SQL/blob/master/notes/SQL%20Lecture%20Note.pdf)
+[SQL -- Syntax](https://github.com/JiaRuiShao/SQL/blob/master/notes/SQL%20Syntax.pdf)
 
 [SQL -- DDL](https://github.com/JiaRuiShao/SQL/blob/master/notes/SQL_1.mdown)
 
