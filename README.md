@@ -14,6 +14,10 @@
 
 ### Practice
 
+[Analytics with SQL questions](https://github.com/JiaRuiShao/SQL/blob/master/practice/Homework%231%20Analytics%20with%20SQL.pdf)
+
+[Analytics with SQL answers](https://github.com/JiaRuiShao/SQL/blob/master/practice/camping~1.sql)
+
 [Practice Question -- classic_models](https://github.com/JiaRuiShao/SQL/blob/master/practice/Assignment%20SQL%20Questions.pdf)
 
 [Practice Answer](https://github.com/JiaRuiShao/SQL/blob/master/practice/HW%20--%20SQL.sql)
